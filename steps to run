@@ -1,0 +1,13 @@
+## Run
+1. Start the backend from `backend`:
+   `python -m venv venv`
+   `venv\\Scripts\\Activate.ps1`
+   `pip install -r requirements.txt`
+   `uvicorn main:app --reload`
+3. Open the frontend older and select live server and continue with application.
+4. Log in.
+5. Create a folder from **Folders**.
+6. Click **Create Note** on that folder.
+7. Confirm the Folder dropdown shows the folder name.
+8. Enter a title/content and click **Save**.
+9. Return to Notes Board and open the folder. The note should be there.
