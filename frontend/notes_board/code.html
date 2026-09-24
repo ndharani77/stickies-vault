@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stickies Vault · Notes Board</title><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../professional.css"></head>
+<body><div class="app-shell"><div class="top-atmosphere"><div class="atmo one"></div><div class="atmo two"></div><div class="atmo three"></div></div>
+<aside class="board-sidebar"><a class="board-sidebar-brand" href="../notes_board/code.html"><img src="../assets/stickies_lock_app_logo.svg"><span><strong>Stickies Vault</strong><small>Your Secure Notes</small></span></a><nav class="board-sidebar-nav" aria-label="Note views"><button class="filter-tab active" data-filter="all"><span class="material-symbols-outlined">inventory_2</span><span>All Notes</span></button><button class="filter-tab" data-filter="ideas"><span class="material-symbols-outlined">lightbulb</span><span>Ideas</span></button><button class="filter-tab" data-filter="todo"><span class="material-symbols-outlined">check_box</span><span>Todo</span></button><button class="filter-tab" data-filter="folders"><span class="material-symbols-outlined">folder</span><span>Folders</span></button><span class="board-sidebar-divider"></span><a href="../security_settings/code.html"><span class="material-symbols-outlined">settings</span><span>Settings</span></a><button class="board-trash" type="button"><span class="material-symbols-outlined">delete</span><span>Trash</span></button></nav><button class="board-theme" id="themeBtn"><span class="material-symbols-outlined">dark_mode</span><strong>Dark Mode</strong><span class="material-symbols-outlined board-theme-chevron">expand_more</span></button></aside>
+<header class="app-header"><div class="header-inner"><div class="board-mobile-brand"><img class="brand-logo" src="../assets/stickies_lock_app_logo.svg"><strong>Stickies Vault</strong></div><div style="display:flex;align-items:center;gap:6px"><button class="icon-btn" id="lockBtn" title="Lock vault"><span class="material-symbols-outlined">lock</span></button><button class="avatar" id="settingsBtn" title="Settings"><span class="material-symbols-outlined" style="font-size:18px">person</span></button></div></div></header>
+<main class="page"><div class="container" style="position:relative;z-index:1">
+<div class="board-toolbar"><div class="board-heading"><h1>All Notes</h1><p>Capture your thoughts, ideas and more</p></div><div class="board-actions"><div class="search-box"><span class="material-symbols-outlined">search</span><input id="searchInput" placeholder="Search notes..."><button class="icon-btn" id="clearSearch" style="display:none;width:34px;height:34px"><span class="material-symbols-outlined" style="font-size:18px">cancel</span></button></div><button class="btn btn-primary" id="newNoteBtn"><span class="material-symbols-outlined">add</span><span>New Note</span></button></div></div>
+<div class="filter-bar" style="margin-top:12px"><button class="filter-tab active" data-filter="all">All Notes</button><button class="filter-tab" data-filter="pinned">Pinned</button><button class="filter-tab" data-filter="ideas">Ideas</button><button class="filter-tab" data-filter="todo">Todo</button><button class="filter-tab" data-filter="folders">Folders</button></div>
+<div id="folderWorkspace" class="folder-workspace" style="display:none"></div>
+<div id="notesArea" class="notes-columns"></div>
+</div></main>
+<nav class="bottom-nav"><div class="nav-inner"><a class="nav-item active" href="../notes_board/code.html"><span class="material-symbols-outlined">sticky_note_2</span><span>Board</span></a><a class="nav-item" href="../security_settings/code.html"><span class="material-symbols-outlined">tune</span><span>Settings</span></a><button class="nav-item" id="focusSearch"><span class="material-symbols-outlined">search</span><span>Search</span></button><a class="nav-item" href="../note_editor/code.html?type=normal"><span class="material-symbols-outlined">add_circle</span><span>New Note</span></a></div></nav>
+<div class="fab-wrap"><div class="fab-palette" id="palette"><button class="palette-swatch" style="background:#fef08a;color:#2a1700" data-create="normal" title="New Note"><span class="material-symbols-outlined">edit</span></button><button class="palette-swatch" style="background:#ddd6fe;color:#1b1735" data-create="favorite" title="Favorite Note"><span class="material-symbols-outlined">favorite</span></button><button class="palette-swatch" style="background:#fbcfe8;color:#93000a" data-create="secret" title="Secret Note"><span class="material-symbols-outlined">shield_lock</span></button><button class="palette-swatch" style="background:#a7f3d0;color:#1e1e24" data-create="checklist" title="Checklist / To-Do"><span class="material-symbols-outlined">check_box</span></button></div><button class="fab" id="fab"><span class="material-symbols-outlined">add</span></button></div>
+<div class="modal-backdrop" id="urlModal"><div class="modal"><h3>Open link</h3><p id="urlText"></p><div class="choice-grid"><button class="choice-card" id="openApp"><strong>Open in App</strong><span>Try an in-app viewer.</span></button><button class="choice-card" id="openBrowser"><strong>Open in Browser</strong><span>Use a normal browser tab.</span></button></div><label style="display:flex;gap:7px;align-items:center;font-size:11px;margin-top:13px"><input type="checkbox" id="rememberUrl"> Remember my choice</label><div class="modal-actions"><button class="btn btn-soft" id="urlCancel">Ask Every Time</button></div></div></div>
+<div class="modal-backdrop" id="viewerModal"><div class="modal" style="width:min(900px,100%);padding:12px"><div style="display:flex;justify-content:space-between;align-items:center;padding:4px 5px 10px"><strong style="font-size:13px">In-App Viewer</strong><div style="display:flex;gap:7px"><button class="btn btn-soft" id="viewerBrowser">Browser</button><button class="icon-btn" id="viewerClose"><span class="material-symbols-outlined">close</span></button></div></div><iframe id="viewerFrame" style="width:100%;height:70vh;border:0;border-radius:15px;background:white"></iframe></div></div>
+<div class="modal-backdrop" id="folderModal"><div class="modal"><h3>Create folder</h3><p>Give the folder a clear name. You can create notes directly inside it from the board.</p><div class="field"><label>Folder name</label><input id="folderNameInput" type="text" maxlength="100" placeholder="e.g. Projects"></div><div class="modal-actions"><button class="btn btn-soft" id="closeFolderModal">Cancel</button><button class="btn btn-primary" id="createFolderConfirm"><span class="material-symbols-outlined">create_new_folder</span><span>Create Folder</span></button></div></div></div>
+<div class="modal-backdrop" id="secretModal"><div class="modal"><h3>Unlock secret note</h3><p>Enter the current vault PIN to reveal this protected note.</p><div class="field"><label>4-digit PIN</label><input id="secretPin" type="password" inputmode="numeric" maxlength="4"></div><div class="modal-actions"><button class="btn btn-soft" id="secretCancel">Cancel</button><button class="btn btn-primary" id="secretUnlock">Reveal</button></div></div></div>
+<script src="../common.js"></script><script>
+const S=window.Stickies; S.requirePage(); const reminderTimer=S.scheduleReminderWatcher();
+let allNotes=[], folders=[], filter='all', search='', urlPending='', secretPendingId=null, folderAction={type:'create',id:null};
+const $=id=>document.getElementById(id), notesArea=$('notesArea');
+const colors=['yellow','mint','lavender','rose','peach','cyan','white'];
+const colorAliases={'#ffd92f':'yellow','#83dfbd':'mint','#b99af4':'lavender','#f5b1d1':'rose','#ffc47c':'peach','#82c9f2':'cyan','green':'mint','purple':'lavender','pink':'rose','orange':'peach','sky':'cyan'};
+function noteColor(c){return colorAliases[String(c||'').toLowerCase()]|| (colors.includes(c)?c:'yellow')}
+function folderName(id){if(!id)return 'Unfiled'; const f=folders.find(x=>x.id===Number(id)); return f?.name||'Unfiled'}
+function meta(n){return n?.content?S.jsonContent(n.content):S.jsonContent(JSON.stringify(n||{}))}
+function noteFolderId(n){
+  const m=meta(n);
+  return m.folderId!==null&&m.folderId!==undefined&&String(m.folderId)!==''?m.folderId:(n.folderId??null);
+}
+function manualTags(m){
+  const raw=String(m.tags??m.tag??'').trim();
+  return raw.split(/[\s,]+/).map(tag=>tag.trim()).filter(Boolean);
+}
+function isFiledNote(m,n={}){
+  const folderId=m.folderId!==null&&m.folderId!==undefined&&String(m.folderId)!==''?m.folderId:n.folderId;
+  const folder=m.folder&&String(m.folder).toLowerCase()!=='unfiled'?m.folder:n.folder;
+  return (folderId!==null&&folderId!==undefined&&String(folderId)!=='') || (folder&&String(folder).toLowerCase()!=='unfiled');
+}
+function displayTag(m){
+  const tags=manualTags(m);
+  if(tags.length)return tags.map(tag=>`<span class="tag">${S.escapeHtml(tag.startsWith('#')?tag:`#${tag}`)}</span>`).join('');
+  const fallback=m.type==='checklist'?'#TODO':m.secret?'#VAULT':'#NOTE';
+  return `<span class="tag">${fallback}</span>`;
+}
+function isIdeas(m){return manualTags(m).some(tag=>S.normalizeTag(tag)==='ideas')}
+function renderText(text,m){
+  const lines=String(text||'').split(/\r?\n/).map(line=>line.trim()).filter(Boolean);
+  if(lines.length>1)return `<ul class="note-bullets">${lines.map(line=>`<li>${S.smartFormat(line.replace(/^[-*•]\s+/,''),true)}</li>`).join('')}</ul>`;
+  return S.smartFormat(lines[0]||'',true);
+}
+function matches(n,includeFolder=false){const m=meta(n);if(!includeFolder&&isFiledNote(m,n))return false;if(filter==='pinned'&&!m.pinned)return false;if(filter==='ideas'&&!isIdeas(m))return false;if(filter==='todo'&&!(m.type==='checklist'||manualTags(m).some(tag=>S.normalizeTag(tag)==='todo')))return false;const hay=[n.title,m.text,m.tags,m.tag,m.color,folderName(m.folderId??n.folderId)].join(' ').toLowerCase();return !search||hay.includes(search)}
+function noteUpdatedAt(n){return n.updated_at||n.updatedAt||n.created_at||n.createdAt||null}
+function noteDateValue(value){
+  if(!value) return 0;
+  const text=String(value);
+  return Date.parse(/[zZ]|[+-]\d{2}:?\d{2}$/.test(text)?text:`${text}Z`)||0;
+}
+function sortNotes(items){return [...items].sort((a,b)=>{const ma=meta(a),mb=meta(b);if(ma.pinned!==mb.pinned)return (mb.pinned?1:0)-(ma.pinned?1:0);return noteDateValue(noteUpdatedAt(b))-noteDateValue(noteUpdatedAt(a))})}
+function noteIsLong(m){return String(m.text||'').length>260||(m.text||'').split(/\r?\n/).length>6||(m.items||[]).length>5||(m.rows||[]).length>5}
+function noteMedia(m){let h='';if(m.images?.length){h+=`<div class="note-media">${m.images.slice(0,4).map(im=>`<img src="${im.dataUrl}" alt="${S.escapeHtml(im.name||'Attached image')}">`).join('')}</div>`}if(m.doodle)h+=`<img class="note-doodle" src="${m.doodle}" alt="Doodle">`;if(m.audio?.dataUrl)h+=`<div class="note-audio"><span class="material-symbols-outlined">mic</span><audio controls src="${m.audio.dataUrl}" style="height:28px;max-width:100%"></audio></div>`;return h}
+function cardHtml(n,index){
+  const m=meta(n),c=noteColor(m.color);
+  const longNote=noteIsLong(m);
+  let body='';
+  if(m.secret) body=`<div class="secret-mask" data-reveal="${n.id}"><span class="material-symbols-outlined" style="font-size:26px;color:#b42318">key</span><strong>Protected Note</strong><small>Tap to reveal</small></div>`;
+  else if(m.type==='checklist') body=`<div class="${longNote?'note-preview-clamp ':''}checklist">${(m.items||[]).map((it,i)=>`<label class="check-row ${it.done?'done':''}" data-note="${n.id}" data-item="${i}"><input type="checkbox" ${it.done?'checked':''}><span>${renderText(it.text||'',m)}</span></label>`).join('')}</div>`;
+  else if(m.layout==='structured'&&(m.rows||[]).length) body=`<div class="${longNote?'note-preview-clamp ':''}structured-table">${m.rows.map(r=>`<div class="structured-row"><span class="label">${S.escapeHtml(r.label||'')}</span><span>${renderText(r.value||'',m)}</span></div>`).join('')}</div>${m.footer?`<div class="note-structured-footer">${renderText(m.footer,m)}</div>`:''}`;
+  else body=`<div class="${longNote?'note-preview-clamp ':''}note-text">${renderText(m.text||'',m)}</div>`;
+  const reminder=m.reminderAt?`<div class="note-reminder"><span class="material-symbols-outlined" style="font-size:13px;vertical-align:middle">notifications_active</span> ${S.dateTimeLabel(m.reminderAt)}${m.reminderLabel?` · ${S.escapeHtml(m.reminderLabel)}`:''}</div>`:'';
+  const tag=displayTag(m);
+  const menu=`<div class="note-menu-wrap"><button type="button" class="note-menu-btn" data-menu="${n.id}" title="More"><span class="material-symbols-outlined" style="font-size:18px">more_horiz</span></button><div class="note-menu" id="menu-${n.id}"><button type="button" data-edit="${n.id}"><span class="material-symbols-outlined" style="font-size:18px">edit</span>Edit</button><button type="button" data-pin="${n.id}"><span class="material-symbols-outlined" style="font-size:18px">push_pin</span>${m.pinned?'Unpin':'Pin to top'}</button><button type="button" data-fav="${n.id}"><span class="material-symbols-outlined" style="font-size:18px">favorite</span>${m.favorite?'Unfavorite':'Favorite'}</button><button type="button" data-share="${n.id}"><span class="material-symbols-outlined" style="font-size:18px">ios_share</span>Share</button><button type="button" class="danger" data-delete="${n.id}"><span class="material-symbols-outlined" style="font-size:18px">delete</span>Delete</button></div></div>`;
+  const showMore=longNote?`<button type="button" class="show-more" data-show-more="${n.id}">Show more</button>`:'';
+  return `<article class="note-card note-${c}" data-id="${n.id}"><div class="note-head"><div class="note-tags">${tag}</div><div class="note-card-status">${m.pinned?'<span class="card-icon" title="Pinned"><span class="material-symbols-outlined">push_pin</span></span>':''}${m.secret?'<span class="card-icon" title="Locked"><span class="material-symbols-outlined">lock</span></span>':''}${m.favorite?'<span class="card-icon" title="Favorite"><span class="material-symbols-outlined">favorite</span></span>':''}</div></div><h3 class="note-title">${S.escapeHtml(n.title||'Untitled Note')}</h3>${body}${noteMedia(m)}${reminder}<div class="note-footer"><span>${S.dateLabel(noteUpdatedAt(n))}</span><span class="note-footer-actions">${showMore}${menu}</span></div></article>`;
+}
+function render(){
+  const folderWorkspace=$('folderWorkspace');
+  if(filter==='folders'){
+    notesArea.style.display='none';
+    folderWorkspace.style.display='block';
+    renderFolderWorkspace();
+    return;
+  }
+  notesArea.style.display='';
+  folderWorkspace.style.display='none';
+  const items=sortNotes(allNotes.filter(n=>matches(n,false)));
+  if(!items.length){
+    notesArea.innerHTML=`<div class="empty-state-page"><span class="material-symbols-outlined">sticky_note_2</span><strong>No notes here</strong></div>`;
+    return;
+  }
+  notesArea.innerHTML=items.map(cardHtml).join('');
+  attachCardEvents();
+}
+function attachCardEvents(){
+  notesArea.querySelectorAll('.note-card').forEach(card=>card.addEventListener('click',e=>{if(e.target.closest('.note-menu-wrap')||e.target.closest('.note-menu-btn')||e.target.closest('.note-menu')||e.target.closest('.show-more')||e.target.closest('.check-row')||e.target.closest('.smart-url')||e.target.closest('[data-reveal]')||e.target.closest('audio'))return;S.go(`../note_editor/code.html?edit=${card.dataset.id}`)}));
+  notesArea.querySelectorAll('.note-menu-btn').forEach(btn=>btn.addEventListener('click',e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const wrap = btn.closest('.note-menu-wrap');
+    const menu = wrap ? wrap.querySelector('.note-menu') : null;
+    if(!menu) return;
+    const isOpen = menu.classList.contains('open');
+    document.querySelectorAll('.note-menu').forEach(x=>x.classList.remove('open'));
+    if(!isOpen) menu.classList.add('open');
+  }));
+  document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>S.go(`../note_editor/code.html?edit=${b.dataset.edit}`));
+  document.querySelectorAll('[data-pin]').forEach(b=>b.onclick=()=>toggleFlag(String(b.dataset.pin),'pinned'));
+  document.querySelectorAll('[data-fav]').forEach(b=>b.onclick=()=>toggleFavorite(String(b.dataset.fav)));
+  document.querySelectorAll('[data-share]').forEach(b=>b.onclick=()=>shareNote(String(b.dataset.share)));
+  document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteNote(String(b.dataset.delete)));
+  notesArea.querySelectorAll('[data-show-more]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();S.go(`../note_editor/code.html?edit=${b.dataset.showMore}`)});
+  notesArea.querySelectorAll('.check-row').forEach(row=>row.addEventListener('click',e=>e.stopPropagation()));
+  notesArea.querySelectorAll('.check-row input').forEach(input=>input.addEventListener('change',async e=>{const row=e.target.closest('.check-row'),n=allNotes.find(x=>String(x.id)===String(row.dataset.note));if(!n)return;const m=meta(n);m.items=m.items||[];m.items[Number(row.dataset.item)].done=e.target.checked;try{if(String(n.id).startsWith('local-')){n.content=S.serialize(m);const cached=JSON.parse(localStorage.getItem('stickies_vault_notes')||'[]').map(x=>String(x.id)===String(n.id)?{...x,content:n.content}:x);localStorage.setItem('stickies_vault_notes',JSON.stringify(cached))}else{const up=await S.api('/notes/'+n.id,{method:'PUT',body:JSON.stringify({title:n.title,content:S.serialize(m)})});Object.assign(n,up)}render();S.toast('Checklist saved','check_circle')}catch(err){e.target.checked=!e.target.checked;S.toast(err.message,'error')}}));
+  notesArea.querySelectorAll('[data-reveal]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();secretPendingId=String(el.dataset.reveal);$('secretPin').value='';$('secretModal').classList.add('show');setTimeout(()=>$('secretPin').focus(),80)}));
+  notesArea.querySelectorAll('.smart-url').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openSmartUrl(a.dataset.url)}));
+  document.querySelectorAll('.note-menu').forEach(m=>m.addEventListener('click',e=>e.stopPropagation()));
+}
+if(!window.__noteMenuCloseBound){
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.note-menu') && !e.target.closest('.note-menu-btn')){
+      document.querySelectorAll('.note-menu').forEach(x=>x.classList.remove('open'));
+    }
+  });
+  window.__noteMenuCloseBound=true;
+}
+async function load(){
+  try{
+    const remote=await S.api('/notes');
+    const local=(()=>{try{return JSON.parse(localStorage.getItem('stickies_vault_notes')||'[]')}catch{return[]}})();
+    const byId=new Map();
+    [...local,...remote].forEach(n=>byId.set(String(n.id),n));
+    allNotes=[...byId.values()];
+    folders=await S.getFolders();
+    render();
+  }catch(e){
+    try{
+      allNotes=JSON.parse(localStorage.getItem('stickies_vault_notes')||'[]');
+      folders=typeof S.localFolders==='function'?S.localFolders():JSON.parse(localStorage.getItem('stickies_vault_folders_v1')||'[]');
+      render();
+      if(!allNotes.length) S.toast(e.message,'error');
+    }catch{S.toast(e.message,'error')}
+  }
+}
+async function saveMeta(n,m,msg){const up=await S.api('/notes/'+n.id,{method:'PUT',body:JSON.stringify({title:n.title,content:S.serialize(m)})});Object.assign(n,up);render();S.toast(msg,'check_circle')}
+async function toggleFlag(id,key){const n=allNotes.find(x=>String(x.id)===String(id));if(!n)return;const m=meta(n);m[key]=!m[key];const message=m[key]?'Pinned to top':'Unpinned';try{if(String(n.id).startsWith('local-')){n.content=S.serialize(m);const cached=JSON.parse(localStorage.getItem('stickies_vault_notes')||'[]').map(x=>String(x.id)===String(n.id)?{...x,content:n.content}:x);localStorage.setItem('stickies_vault_notes',JSON.stringify(cached));render();S.toast(message,'push_pin')}else{await saveMeta(n,m,message);const cached=JSON.parse(localStorage.getItem('stickies_vault_notes')||'[]').filter(x=>String(x.id)!==String(n.id));cached.push({...n});localStorage.setItem('stickies_vault_notes',JSON.stringify(cached))}}catch(e){n.content=S.serialize(m);const cached=JSON.parse(localStorage.getItem('stickies_vault_notes')||'[]').filter(x=>String(x.id)!==String(n.id));cached.push({...n});localStorage.setItem('stickies_vault_notes',JSON.stringify(cached));render();S.toast(`${message} locally`,'push_pin')}}
+async function toggleFavorite(id){const n=allNotes.find(x=>String(x.id)===String(id));if(!n)return;const m=meta(n);m.favorite=!m.favorite;if(m.favorite)m.color=m.color||'lavender';if(m.favorite)m.type='favorite';else if(m.type==='favorite')m.type='normal';try{if(String(n.id).startsWith('local-')){n.content=S.serialize(m);const cached=JSON.parse(localStorage.getItem('stickies_vault_notes')||'[]').map(x=>String(x.id)===String(n.id)?{...x,content:n.content}:x);localStorage.setItem('stickies_vault_notes',JSON.stringify(cached));render();S.toast(m.favorite?'Added to favorites':'Removed from favorites','favorite')}else await saveMeta(n,m,m.favorite?'Added to favorites':'Removed from favorites')}catch(e){S.toast(e.message,'error')}}
+async function deleteNote(id){
+  if(!confirm('Delete this sticky note?'))return;
+  try{
+    const noteId=String(id);
+    if(!noteId.startsWith('local-')) await S.api('/notes/'+encodeURIComponent(noteId),{method:'DELETE'});
+    try{
+      const cached=JSON.parse(localStorage.getItem('stickies_vault_notes')||'[]');
+      localStorage.setItem('stickies_vault_notes',JSON.stringify(cached.filter(n=>String(n.id)!==noteId)));
+    }catch{}
+    allNotes=allNotes.filter(n=>String(n.id)!==noteId);
+    render();
+    S.toast('Note deleted','delete');
+  }catch(e){S.toast(e.message,'error')}
+}
+async function shareNote(id){const n=allNotes.find(x=>x.id===id);if(!n)return;const m=meta(n);const text=m.text||((m.items||[]).map(i=>`☐ ${i.text}`).join('\n'));try{if(navigator.share){await navigator.share({title:n.title,text:text||'Stickies Vault note'});}else{await navigator.clipboard.writeText(`${n.title}\n\n${text||''}`);S.toast('Note copied to clipboard','content_copy')}}catch(e){if(e?.name!=='AbortError')S.toast('Sharing is not available here','share')}
+}
+async function openSmartUrl(url){const pref=localStorage.getItem('stickies_url_pref')||'ask';if(pref==='browser'){window.open(url,'_blank','noopener');return}if(pref==='app'){openInApp(url);return}urlPending=url;$('urlText').textContent=url;$('rememberUrl').checked=false;$('urlModal').classList.add('show')}
+function openInApp(url){$('viewerFrame').src=url;$('viewerModal').classList.add('show')}
+$('openApp').onclick=()=>{if($('rememberUrl').checked)localStorage.setItem('stickies_url_pref','app');$('urlModal').classList.remove('show');openInApp(urlPending)};$('openBrowser').onclick=()=>{if($('rememberUrl').checked)localStorage.setItem('stickies_url_pref','browser');$('urlModal').classList.remove('show');window.open(urlPending,'_blank','noopener')};$('urlCancel').onclick=()=>{localStorage.removeItem('stickies_url_pref');$('urlModal').classList.remove('show')};$('viewerClose').onclick=()=>{$('viewerFrame').src='about:blank';$('viewerModal').classList.remove('show')};$('viewerBrowser').onclick=()=>window.open($('viewerFrame').src,'_blank','noopener');
+document.querySelectorAll('.filter-tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.filter-tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll(`[data-filter="${btn.dataset.filter}"]`).forEach(b=>b.classList.add('active'));filter=btn.dataset.filter;render()});$('searchInput').addEventListener('input',e=>{search=e.target.value.trim().toLowerCase();$('clearSearch').style.display=search?'flex':'none';render()});$('clearSearch').onclick=()=>{$('searchInput').value='';search='';$('clearSearch').style.display='none';render()};$('focusSearch').onclick=()=>{$('searchInput').focus();window.scrollTo({top:0,behavior:'smooth'})};$('newNoteBtn').onclick=()=>S.openEditor('normal');$('themeBtn').onclick=()=>{S.toggleTheme();document.querySelector('#themeBtn span').textContent=document.documentElement.dataset.theme==='dark'?'light_mode':'dark_mode'};
+function renderFolderWorkspace(){
+  const ws=$('folderWorkspace');
+  ws.style.display='block';
+  if(!folders.length){
+    ws.innerHTML=`<div class="empty-state-page folder-empty-state"><span class="material-symbols-outlined">folder_open</span><strong>No folders here</strong><button class="btn btn-primary" id="emptyNewFolder"><span class="material-symbols-outlined">create_new_folder</span><span>New Folder</span></button></div>`;
+    $('emptyNewFolder').onclick=openCreateFolder;
+    return;
+  }
+  const folderCards=folders.map(f=>{
+    const notes=sortNotes(allNotes.filter(n=>Number(noteFolderId(n))===f.id)).slice(0,3);
+    const count=allNotes.filter(n=>Number(noteFolderId(n))===f.id).length;
+    const list=notes.length?notes.map(n=>`<div class="folder-note-row"><span class="material-symbols-outlined">description</span><span>${S.escapeHtml(n.title)}</span></div>`).join(''):`<div class="folder-note-empty">No notes in this folder yet.</div>`;
+    return `<section class="folder-card card" data-folder-card="${f.id}"><div class="folder-card-top"><div class="folder-icon"><span class="material-symbols-outlined">folder</span></div><div class="folder-card-title"><strong>${S.escapeHtml(f.name)}</strong><span>${count} note${count===1?'':'s'}</span></div><div class="folder-menu-wrap"><button type="button" class="icon-btn folder-more" data-folder-more="${f.id}" title="Folder options" aria-label="Folder options for ${S.escapeHtml(f.name)}" aria-haspopup="menu" aria-expanded="false"><span class="material-symbols-outlined">more_horiz</span></button><div class="note-menu folder-menu" role="menu"><button type="button" role="menuitem" data-folder-new="${f.id}"><span class="material-symbols-outlined">add</span>Create Note</button><button type="button" role="menuitem" data-folder-open="${f.id}"><span class="material-symbols-outlined">arrow_forward</span>Open Notes</button><button type="button" role="menuitem" data-folder-rename="${f.id}"><span class="material-symbols-outlined">edit</span>Rename</button><button type="button" role="menuitem" class="danger" data-folder-delete="${f.id}"><span class="material-symbols-outlined">delete</span>Delete</button></div></div></div><div class="folder-note-list">${list}</div></section>`;
+  }).join('');
+  ws.innerHTML=`<div class="folder-view-header"><div><strong>Your Folders</strong><span>Create folders and add notes directly inside them.</span></div><button class="btn btn-primary btn-small" id="folderViewNew"><span class="material-symbols-outlined">create_new_folder</span><span>New Folder</span></button></div><div class="folder-grid">${folderCards}</div>`;
+  $('folderViewNew').onclick=openCreateFolder;
+  ws.querySelectorAll('[data-folder-card]').forEach(card=>card.onclick=e=>{
+    if(e.target.closest('.folder-menu-wrap')||e.target.closest('.folder-menu'))return;
+    openFolderNotes(Number(card.dataset.folderCard));
+  });
+  ws.querySelectorAll('[data-folder-new]').forEach(b=>b.onclick=()=>S.go(`../note_editor/code.html?type=normal&folder=${encodeURIComponent(b.dataset.folderNew)}`));
+  ws.querySelectorAll('[data-folder-open]').forEach(b=>b.onclick=()=>openFolderNotes(Number(b.dataset.folderOpen)));
+  ws.querySelectorAll('[data-folder-rename]').forEach(b=>b.onclick=()=>renameFolder(Number(b.dataset.folderRename)));
+  ws.querySelectorAll('[data-folder-delete]').forEach(b=>b.onclick=()=>deleteFolder(Number(b.dataset.folderDelete)));
+  ws.querySelectorAll('[data-folder-more]').forEach(b=>{
+    const menu=b.closest('.folder-menu-wrap')?.querySelector('.folder-menu');
+    b.addEventListener('click', e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      const shouldOpen = menu && !menu.classList.contains('open');
+      document.querySelectorAll('.folder-menu').forEach(x=>{
+        x.classList.remove('open');
+        const trigger=x.closest('.folder-menu-wrap')?.querySelector('[data-folder-more]');
+        if(trigger) trigger.setAttribute('aria-expanded','false');
+      });
+      if(menu && shouldOpen){
+        menu.classList.add('open');
+        b.setAttribute('aria-expanded','true');
+      }
+    });
+  });
+  ws.querySelectorAll('.folder-menu').forEach(menu=>menu.addEventListener('click', e=>e.stopPropagation()));
+}
+if(!window.__folderMenuCloseBound){
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.folder-menu')&&!e.target.closest('[data-folder-more]')){
+      document.querySelectorAll('.folder-menu').forEach(menu=>menu.classList.remove('open'));
+    }
+  });
+  window.__folderMenuCloseBound=true;
+}
+function openRenameFolder(id){
+  const folder=folders.find(f=>f.id===id); if(!folder)return;
+  folderAction={type:'rename', id};
+  const modalTitle=document.querySelector('#folderModal h3');
+  const submitBtn=$('createFolderConfirm');
+  const modalText=document.querySelector('#folderModal p');
+  $('folderNameInput').value=folder.name;
+  if(modalTitle) modalTitle.textContent='Rename folder';
+  if(modalText) modalText.textContent='Update the folder name below.';
+  submitBtn.innerHTML='<span class="material-symbols-outlined">edit</span><span>Rename Folder</span>';
+  $('folderModal').classList.add('show');
+  setTimeout(()=>$('folderNameInput').focus(),80);
+}
+async function renameFolder(id){
+  openRenameFolder(id);
+}
+async function deleteFolder(id){
+  const folder=folders.find(f=>f.id===id); if(!folder)return;
+  const count=allNotes.filter(n=>Number(noteFolderId(n))===id).length;
+  const message=count?`Delete "${folder.name}"? ${count} note${count===1?'':'s'} will move to Unfiled.`:`Delete "${folder.name}"?`;
+  if(!confirm(message))return;
+  try{await S.api('/folders/'+id,{method:'DELETE'}); folders=folders.filter(f=>f.id!==id); allNotes=allNotes.map(n=>{const m=meta(n);if(Number(m.folderId)===id){m.folderId=null;m.folder='Unfiled';n.content=S.serialize(m)}return n}); render(); S.toast('Folder deleted; notes moved to Unfiled','delete')}catch(e){S.toast(e.message,'error')}
+}
+function openCreateFolder(){
+  folderAction={type:'create', id:null};
+  const modalTitle=document.querySelector('#folderModal h3');
+  const submitBtn=$('createFolderConfirm');
+  const modalText=document.querySelector('#folderModal p');
+  $('folderNameInput').value='';
+  if(modalTitle) modalTitle.textContent='Create folder';
+  if(modalText) modalText.textContent='Give the folder a clear name. You can create notes directly inside it from the board.';
+  submitBtn.innerHTML='<span class="material-symbols-outlined">create_new_folder</span><span>Create Folder</span>';
+  $('folderModal').classList.add('show');
+  setTimeout(()=>$('folderNameInput').focus(),80);
+}
+async function createFolderFromBoard(){
+  const name=$('folderNameInput').value.trim();
+  if(!name){S.toast('Enter a folder name','create_new_folder');$('folderNameInput').focus();return;}
+  try{
+    if(folderAction.type==='rename' && folderAction.id){
+      const updated=await S.api('/folders/'+folderAction.id,{method:'PUT',body:JSON.stringify({name})});
+      folders=folders.map(f=>f.id===folderAction.id?updated:f);
+      folderAction={type:'create',id:null};
+      $('folderModal').classList.remove('show');
+      render();
+      S.toast('Folder renamed','edit');
+      return;
+    }
+    const f=await S.createFolder(name);
+    folders.push(f);
+    folderAction={type:'create',id:null};
+    $('folderModal').classList.remove('show');
+    render();
+    S.toast(`Folder "${name}" created`,'create_new_folder');
+  }catch(e){S.toast(e.message,'error')}
+}
+function openFolderNotes(id){
+  const b=document.querySelector('[data-filter="all"]');
+  document.querySelectorAll('.filter-tab').forEach(x=>x.classList.remove('active'));
+  b?.classList.add('active');
+  filter='all';
+  const folder=folders.find(f=>f.id===id);
+  $('notesArea').style.display='block';
+  $('folderWorkspace').style.display='none';
+  const items=sortNotes(allNotes.filter(n=>Number(noteFolderId(n))===id && matches(n,true)));
+  const noteCount=$('noteCount'); if(noteCount)noteCount.textContent=`${items.length} notes · ${folder?.name||'Folder'}`;
+  if(!items.length){notesArea.innerHTML=`<div class="empty card"><span class="material-symbols-outlined">folder_open</span><strong>${S.escapeHtml(folder?.name||'Folder')} is empty</strong><span>Use Create Note to add the first note.</span><button class="btn btn-primary" id="folderEmptyCreate"><span class="material-symbols-outlined">add</span><span>Create Note</span></button></div>`;$('folderEmptyCreate').onclick=()=>S.go(`../note_editor/code.html?type=normal&folder=${id}`);return;}
+  notesArea.innerHTML=items.map(cardHtml).join('');
+  attachCardEvents();
+}
+async function loadFolders(){folders=await S.getFolders()}
+$('createFolderConfirm').onclick=createFolderFromBoard;
+$('closeFolderModal').onclick=()=>{
+  folderAction={type:'create',id:null};
+  const modalTitle=document.querySelector('#folderModal h3');
+  const modalText=document.querySelector('#folderModal p');
+  const submitBtn=$('createFolderConfirm');
+  if(modalTitle) modalTitle.textContent='Create folder';
+  if(modalText) modalText.textContent='Give the folder a clear name. You can create notes directly inside it from the board.';
+  if(submitBtn) submitBtn.innerHTML='<span class="material-symbols-outlined">create_new_folder</span><span>Create Folder</span>';
+  $('folderModal').classList.remove('show');
+};
+$('folderNameInput').addEventListener('keydown',e=>{if(e.key==='Enter')createFolderFromBoard()});
+$('secretCancel').onclick=()=>{$('secretModal').classList.remove('show');secretPendingId=null};$('secretUnlock').onclick=async()=>{const pin=$('secretPin').value.trim();if(!/^\d{4}$/.test(pin)){S.toast('Enter exactly 4 digits','warning');return};const username=S.user()||localStorage.getItem('stickies_username')||'';if(!username){S.toast('No active user found. Please log in again.','person');return}try{const data=await S.api('/login',{method:'POST',body:JSON.stringify({username,password:pin})});if(data?.access_token) S.setSession(data);const n=allNotes.find(x=>String(x.id)===String(secretPendingId));if(n){const m=meta(n);m.secret=false; const card=document.querySelector(`.note-card[data-id="${n.id}"]`);if(card){const mask=card.querySelector('[data-reveal]');if(mask)mask.outerHTML=`<p class="note-text">${renderText(m.text,m)}</p>`}S.toast('Secret note revealed','visibility')}}catch(e){S.toast('Incorrect PIN','error')}$('secretModal').classList.remove('show');secretPendingId=null};
+$('fab').onclick=()=>{$('palette').classList.toggle('open');$('fab').classList.toggle('open')};document.querySelectorAll('[data-create]').forEach(b=>b.onclick=()=>S.openEditor(b.dataset.create));$('lockBtn').onclick=()=>S.logout();$('settingsBtn').onclick=()=>S.go('../security_settings/code.html');load();
+ const trashButton=document.querySelector('.board-trash'); if(trashButton)trashButton.onclick=()=>S.toast('Trash is not enabled yet','delete');
+</script></body></html>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" fill="none">
+  <!-- Adorable fluffy bunny holding a pastel sticky note -->
+  <!-- Long floppy ears -->
+  <ellipse cx="42" cy="30" rx="9" ry="24" fill="#F8FAFC" stroke="#1E1E24" stroke-width="2.5" transform="rotate(-12 42 30)"/>
+  <ellipse cx="42" cy="30" rx="5" ry="16" fill="#FBCFE8" opacity="0.8" transform="rotate(-12 42 30)"/>
+
+  <ellipse cx="78" cy="30" rx="9" ry="24" fill="#F8FAFC" stroke="#1E1E24" stroke-width="2.5" transform="rotate(12 78 30)"/>
+  <ellipse cx="78" cy="30" rx="5" ry="16" fill="#FBCFE8" opacity="0.8" transform="rotate(12 78 30)"/>
+
+  <!-- Round Head -->
+  <circle cx="60" cy="62" r="30" fill="#FFFFFF" stroke="#1E1E24" stroke-width="2.8"/>
+
+  <!-- Eyes (big sparkling kawaii eyes) -->
+  <ellipse cx="48" cy="60" rx="4" ry="5.5" fill="#1E1E24"/>
+  <circle cx="49.5" cy="58" r="1.8" fill="#FFFFFF"/>
+  <ellipse cx="72" cy="60" rx="4" ry="5.5" fill="#1E1E24"/>
+  <circle cx="73.5" cy="58" r="1.8" fill="#FFFFFF"/>
+
+  <!-- Bunny nose & smiling mouth -->
+  <ellipse cx="60" cy="65" rx="2" ry="1.5" fill="#F43F5E"/>
+  <path d="M56,68 C58,70 60,69.5 60,68 C60,69.5 62,70 64,68" stroke="#1E1E24" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+
+  <!-- Blushing cheeks -->
+  <ellipse cx="40" cy="66" rx="4" ry="2.2" fill="#FDA4AF" opacity="0.9"/>
+  <ellipse cx="80" cy="66" rx="4" ry="2.2" fill="#FDA4AF" opacity="0.9"/>
+
+  <!-- Tiny paws holding a mini pastel sticky note -->
+  <g transform="translate(45, 74) rotate(-4)">
+    <rect x="0" y="0" width="30" height="26" rx="4" fill="#FEF08A" stroke="#1E1E24" stroke-width="2"/>
+    <line x1="5" y1="8" x2="25" y2="8" stroke="#854D0E" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <line x1="5" y1="14" x2="20" y2="14" stroke="#854D0E" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+    <circle cx="23" cy="18" r="2" fill="#EC4899"/>
+  </g>
+  <circle cx="44" cy="80" r="4.5" fill="#FFFFFF" stroke="#1E1E24" stroke-width="2"/>
+  <circle cx="76" cy="78" r="4.5" fill="#FFFFFF" stroke="#1E1E24" stroke-width="2"/>
+</svg>

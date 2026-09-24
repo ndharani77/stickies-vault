@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Stickies Vault · Lock Screen</title><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../professional.css"></head>
+<body>
+<div class="app-shell"><div class="top-atmosphere"><div class="atmo one"></div><div class="atmo two"></div><div class="atmo three"></div></div>
+<div class="lock-layout"><div class="lock-card">
+  <div class="lock-hero">
+    <img class="logo" src="../assets/stickies_lock_app_logo.svg" alt="Stickies Icon">
+    
+    <h1 style="margin:13px 0 4px;font-size:28px;line-height:34px;letter-spacing:-.03em">Stickies Vault</h1>
+    <div class="security-pill"><span class="material-symbols-outlined" style="font-size:14px;color:#855300">verified_user</span>Secure Notes Workspace</div>
+    <div style="margin-top:13px;color:var(--muted);font-size:11px">Enter your credentials to access your protected workspace.</div>
+    <div class="user-chip" style="margin:12px auto 0;width:max-content"><span class="material-symbols-outlined" style="font-size:15px">person</span><input id="usernameInput" autocomplete="username" placeholder="Username"><button id="accountBtn" style="border:0;background:transparent;color:#4f46e5;font-size:10px;font-weight:800">Change</button></div>
+    <div class="pin-box" id="pinDots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div>
+  </div>
+  <div class="keypad" id="keypad">
+    <button class="key" data-num="1"><div class="num">1</div><div class="sub">ABC</div></button>
+    <button class="key" data-num="2"><div class="num">2</div><div class="sub">ABC</div></button>
+    <button class="key" data-num="3"><div class="num">3</div><div class="sub">DEF</div></button>
+    <button class="key" data-num="4"><div class="num">4</div><div class="sub">GHI</div></button>
+    <button class="key" data-num="5"><div class="num">5</div><div class="sub">JKL</div></button>
+    <button class="key" data-num="6"><div class="num">6</div><div class="sub">MNO</div></button>
+    <button class="key" data-num="7"><div class="num">7</div><div class="sub">PQRS</div></button>
+    <button class="key" data-num="8"><div class="num">8</div><div class="sub">TUV</div></button>
+    <button class="key" data-num="9"><div class="num">9</div><div class="sub">WXYZ</div></button>
+    <button class="key bio-key" id="biometricBtn"><span class="material-symbols-outlined" style="font-size:27px">fingerprint</span><div class="sub" style="color:var(--blue)">Biometric</div></button>
+    <button class="key" data-num="0"><div class="num">0</div><div class="sub">OPER</div></button>
+    <button class="key" id="backspace"><span class="material-symbols-outlined" style="font-size:25px">backspace</span><div class="sub">BACK</div></button>
+  </div>
+  <div class="lock-aux">
+    <div class="pro-status"><span class="dot"></span><div><strong style="display:block;font-size:11px">Protected workspace</strong><span style="font-size:9px;color:var(--muted)">Session access is secured by your account credentials.</span></div></div>
+    <div class="inline-actions"><button class="btn btn-ghost" id="registerBtn">Create account</button><button class="btn btn-ghost" id="forgotBtn">Forgot Passcode?</button></div>
+  </div>
+</div></div></div>
+<div class="modal-backdrop" id="modal"><div class="modal"><h3 id="modalTitle">Create Stickies account</h3><p id="modalSub">Use a 4-digit PIN so the lock screen stays simple.</p><div class="form-grid"><div class="field"><label>Username</label><input id="regUser" minlength="3" maxlength="100"></div><div class="field"><label>4-digit PIN</label><input id="regPin" inputmode="numeric" maxlength="4" type="password"></div></div><div class="modal-actions"><button class="btn btn-soft" id="closeModal">Cancel</button><button class="btn btn-primary" id="doRegister">Register</button></div></div></div>
+<script src="../common.js"></script><script>
+const S=window.Stickies; S.applyTheme(); let pin=''; const dots=[...document.querySelectorAll('.pin-dot')]; const userInput=document.getElementById('usernameInput');
+const savedUser=localStorage.getItem(S.USER_KEY);
+if(savedUser==='testuser2' || savedUser==='menuuser'){localStorage.removeItem(S.USER_KEY);} 
+userInput.value=savedUser && savedUser!=='testuser2' && savedUser!=='menuuser' ? savedUser : '';
+function redraw(){dots.forEach((d,i)=>d.classList.toggle('filled',i<pin.length));}
+async function login(){ const username=userInput.value.trim(); if(!username){S.toast('Enter your username','person');return} if(pin.length!==4)return; try{S.toast('Checking your PIN…','lock'); const data=await S.api('/login',{method:'POST',body:JSON.stringify({username,password:pin})}); S.setSession(data); sessionStorage.setItem('stickies_unlocked','1'); S.toast('Vault unlocked!','verified'); setTimeout(()=>location.href='../notes_board/code.html',450);}catch(e){pin='';redraw();S.toast(e.message||'Incorrect PIN','error');}}
+document.querySelectorAll('[data-num]').forEach(btn=>btn.addEventListener('click',()=>{if(pin.length>=4)return;pin+=btn.dataset.num;redraw();if(pin.length===4)setTimeout(login,140)}));
+document.getElementById('backspace').onclick=()=>{pin=pin.slice(0,-1);redraw()};
+document.getElementById('biometricBtn').onclick=()=>S.toast('Biometric login is a UI demo on this local build','fingerprint');
+document.getElementById('forgotBtn').onclick=()=>S.toast('Change your PIN from Settings after unlocking','help');
+const modal=document.getElementById('modal'); document.getElementById('registerBtn').onclick=()=>{document.getElementById('regUser').value=userInput.value;modal.classList.add('show')};document.getElementById('closeModal').onclick=()=>modal.classList.remove('show');
+document.getElementById('doRegister').onclick=async()=>{const username=document.getElementById('regUser').value.trim();const password=document.getElementById('regPin').value.trim();if(!/^\d{4}$/.test(password)){S.toast('PIN must be exactly 4 digits','warning');return}try{await S.api('/register',{method:'POST',body:JSON.stringify({username,password})});localStorage.removeItem('stickies_vault_notes');localStorage.removeItem('stickies_vault_folders_v1');localStorage.removeItem('stickies_vault_editor_state_v1');userInput.value=username;localStorage.setItem(S.USER_KEY,username);modal.classList.remove('show');pin='';redraw();S.toast('Account created. Enter the PIN to unlock.','check_circle')}catch(e){S.toast(e.message,'error')}};
+redraw();
+</script></body></html>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" fill="none">
+  <!-- Peeking cute chubby cat mascot with paws over the edge -->
+  <defs>
+    <filter id="catShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#1E1E24" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  <!-- Ears -->
+  <polygon points="26,45 42,16 56,40" fill="#FED7AA" stroke="#1E1E24" stroke-width="2.5" stroke-linejoin="round"/>
+  <polygon points="32,40 42,24 50,38" fill="#F472B6" opacity="0.6"/>
+  
+  <polygon points="64,40 78,16 94,45" fill="#FED7AA" stroke="#1E1E24" stroke-width="2.5" stroke-linejoin="round"/>
+  <polygon points="70,38 78,24 88,40" fill="#F472B6" opacity="0.6"/>
+
+  <!-- Head -->
+  <ellipse cx="60" cy="55" rx="36" ry="30" fill="#FFEDD5" stroke="#1E1E24" stroke-width="2.8"/>
+  <!-- Calico/tabby patch -->
+  <path d="M72,27 C84,33 94,45 92,60 C86,52 80,42 72,27 Z" fill="#FB923C" opacity="0.85"/>
+
+  <!-- Eyes (sparkly kawaii anime curves/dots) -->
+  <ellipse cx="46" cy="54" rx="4.5" ry="5.5" fill="#1E1E24"/>
+  <circle cx="48" cy="52" r="1.8" fill="#FFFFFF"/>
+  <ellipse cx="74" cy="54" rx="4.5" ry="5.5" fill="#1E1E24"/>
+  <circle cx="76" cy="52" r="1.8" fill="#FFFFFF"/>
+
+  <!-- Cute button nose & mouth -->
+  <polygon points="58,60 62,60 60,62.5" fill="#F43F5E"/>
+  <path d="M55,64 C57.5,67 60,66.5 60,64 C60,66.5 62.5,67 65,64" stroke="#1E1E24" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <!-- Rosy cheeks -->
+  <ellipse cx="38" cy="62" rx="4.5" ry="2.5" fill="#FDA4AF" opacity="0.85"/>
+  <ellipse cx="82" cy="62" rx="4.5" ry="2.5" fill="#FDA4AF" opacity="0.85"/>
+
+  <!-- Whiskers -->
+  <line x1="24" y1="58" x2="35" y2="60" stroke="#1E1E24" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="24" y1="64" x2="35" y2="63" stroke="#1E1E24" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="85" y1="60" x2="96" y2="58" stroke="#1E1E24" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="85" y1="63" x2="96" y2="64" stroke="#1E1E24" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Cute little paws resting on border -->
+  <!-- Left paw -->
+  <ellipse cx="40" cy="84" rx="10" ry="8" fill="#FFFFFF" stroke="#1E1E24" stroke-width="2.5"/>
+  <line x1="37" y1="81" x2="37" y2="87" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="43" y1="81" x2="43" y2="87" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- Right paw -->
+  <ellipse cx="80" cy="84" rx="10" ry="8" fill="#FFFFFF" stroke="#1E1E24" stroke-width="2.5"/>
+  <line x1="77" y1="81" x2="77" y2="87" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="83" y1="81" x2="83" y2="87" stroke="#CBD5E1" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

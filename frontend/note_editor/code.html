@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stickies Vault — Note Editor</title><script src="../common.js"></script>
+<style>
+:root{--blue:#1769e0;--ink:#172033;--muted:#657085;--line:#d8e0ea;--bg:#f5f7fb;--card:#fff;--soft:#edf2f8;--input:#fff;--editor-surface:#fff;--shadow:0 5px 18px rgba(27,45,68,.06)}
+:root[data-theme="dark"]{--blue:#84adff;--ink:#f2f4f7;--muted:#98a2b3;--line:#475467;--bg:#101828;--card:#182230;--soft:#243145;--input:#1d2939;--editor-surface:#1d2939;--shadow:0 8px 24px rgba(0,0,0,.28)}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);transition:background .2s,color .2s}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+.app{max-width:1160px;margin:10px auto 28px;padding:0 12px}
+.topbar{height:76px;background:var(--card);border:1px solid var(--line);border-radius:16px;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;box-shadow:0 5px 18px #1b2d4410;position:sticky;top:10px;z-index:10}
+.brand{display:flex;align-items:center;gap:12px}.back{border:0;background:transparent;font-size:29px;color:#536071;width:44px;height:44px;border-radius:12px}.back:hover{background:var(--soft)}
+.logo{width:44px;height:44px;border:2px solid #9eabbc;border-radius:12px;display:grid;place-items:center;font-size:23px;background:var(--card)}
+.brand h1{font-size:22px;margin:0;line-height:1.05}.brand small{display:block;font-size:11px;font-weight:800;letter-spacing:.13em;color:#637087;margin-top:3px}
+.actions{display:flex;gap:10px}.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:11px;padding:11px 17px;font-weight:700;display:inline-flex;align-items:center;gap:8px;min-height:42px}.btn:hover{background:var(--soft)}.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 5px 12px #1769e033}.btn.danger{color:#b42318}
+.panel{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:17px;padding:22px;box-shadow:0 8px 26px #1b2d4410}.editor-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;align-items:start}.editor-sidebar{display:grid;gap:14px;position:sticky;top:98px}.sidebar-section{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--soft)}.sidebar-section .caption{margin-top:0}.editor-main{min-width:0}.editor-main>.caption{margin-top:0}.editor-main .rich{min-height:560px;font-size:16px;line-height:1.7;padding:22px;background:var(--editor-surface)}.editor-main .structured,.editor-main .checklist{max-width:760px}.sidebar-actions{display:grid;gap:8px}.sidebar-actions .btn{width:100%;justify-content:center}.sidebar-section .grid2{display:grid;grid-template-columns:1fr;gap:0}.sidebar-section .folderrow{grid-template-columns:1fr}.sidebar-section .folderrow .btn{margin-top:8px;justify-content:center;width:100%}.sidebar-section .pillrow{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sidebar-section .pill{padding:6px 5px;font-size:10px;min-height:34px;border-radius:9px}.sidebar-section .colors{gap:7px;flex-wrap:wrap}.sidebar-section .color{width:25px;height:25px}.sidebar-section #panelColor{width:25px!important;height:25px!important;margin-left:3px!important}.sidebar-section #plainTab,.sidebar-section #structuredTab{font-size:10px;padding:6px 5px;min-height:32px}.sidebar-section .section{margin-top:0;background:transparent;border:0;box-shadow:none;padding:0}.sidebar-section .sectionhead{display:grid;gap:10px}.sidebar-section .right-actions{display:grid;gap:7px}.sidebar-section .right-actions .btn{width:100%;justify-content:center}.sidebar-section .tip{margin-top:0}.workspace-divider{height:1px;background:var(--line);margin:18px 0}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px}.left-actions,.right-actions{display:flex;gap:10px;align-items:center}.reminder-toggle,.attachments-toggle,.note-type-toggle,.paper-color-toggle{position:relative;width:100%;border:0;background:transparent;color:var(--ink);padding:0 22px 0 0;text-align:left;cursor:pointer}.reminder-toggle:after,.attachments-toggle:after,.note-type-toggle:after,.paper-color-toggle:after{content:"⌄";position:absolute;right:0;top:50%;transform:translateY(-50%);color:var(--muted);font-size:18px;line-height:1}.reminder-toggle.open:after,.attachments-toggle.open:after,.note-type-toggle.open:after,.paper-color-toggle.open:after{content:"⌃"}.reminder-options,.attachments-options,.note-type-options,.paper-color-options{display:none}.reminder-options.open,.attachments-options.open,.note-type-options.open,.paper-color-options.open{display:block}
+.title-field,.tag-field,.folder-field{display:grid;grid-template-columns:58px minmax(0,1fr);gap:8px;align-items:center}.title-field .caption,.tag-field .caption,.folder-field .caption{margin:0}.title-field input,.tag-field input{min-width:0}.folder-field .folderrow{grid-template-columns:minmax(0,1fr) auto;gap:6px}.folder-field .folderrow .btn{margin-top:0;padding:8px 9px;min-height:38px}
+label.caption{display:block;font-size:12px;font-weight:800;letter-spacing:.08em;color:#617086;margin:15px 0 7px}
+input,select,textarea,.rich{width:100%;border:1px solid var(--line);border-radius:11px;background:var(--input);color:var(--ink);outline:none}
+input,select{height:48px;padding:0 13px}textarea{min-height:124px;padding:14px;resize:vertical}.rich{min-height:124px;padding:14px;line-height:1.55;background:var(--editor-surface)}.rich:focus,input:focus,select:focus,textarea:focus{border-color:#6fa3ee;box-shadow:0 0 0 3px #1769e014}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.folderrow{display:grid;grid-template-columns:1fr auto;gap:8px}
+.pillrow{display:flex;gap:9px;flex-wrap:wrap}.pill{border:0;background:var(--soft);color:var(--muted);border-radius:22px;padding:9px 15px;font-weight:750}.pill.active{background:#dceaff;color:#155fc8}
+.secret{background:#fff2b9}.secret.active{background:#ffe89a}
+.colors{display:flex;gap:14px;align-items:center}.color{width:31px;height:31px;border-radius:50%;border:2px solid transparent;position:relative}.color.active{border-color:#26354a;box-shadow:0 0 0 2px #fff inset}.color.active:after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;font-weight:900;color:#172033}.yellow{background:#fef08a}.green{background:#a7f3d0}.purple{background:#ddd6fe}.pink{background:#fbcfe8}.orange{background:#fed7aa}.sky{background:#bae6fd}.white{background:#fff;border-color:#cbd5e1}
+.divider{height:1px;background:#d9e1ea;margin:22px 0 14px}.toolbar{display:flex;gap:8px;margin-bottom:10px}.tool{border:0;background:#e9eef5;border-radius:10px;padding:9px 13px;font-weight:800;color:#34435a}.tool.on{background:#d8e8ff;color:#155fc8}
+.char{display:flex;justify-content:flex-end;color:#68778e;font-size:12px;margin-top:3px}
+.section{margin-top:16px;border:1px solid var(--line);border-radius:16px;padding:15px 16px;box-shadow:0 3px 10px #1b2d4409}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:15px}.sectiontitle{font-weight:800}.sub{font-size:13px;color:#69778d;margin-top:4px}
+.media-preview{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}.media-card{border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--input)}.media-card img{max-width:170px;max-height:110px;border-radius:8px;display:block}.media-card audio{max-width:260px}
+.tip{margin-top:15px;padding:13px 14px;background:var(--soft);border-radius:12px;color:#69778d;font-size:13px}
+.status{margin-top:15px;display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--card);border-radius:14px}.ready{display:flex;align-items:center;gap:9px}.dot{width:10px;height:10px;border-radius:50%;background:#12a66a}.savebottom{display:flex;justify-content:flex-end}
+.toast{position:fixed;right:20px;bottom:20px;background:#172033;color:#fff;padding:12px 16px;border-radius:11px;box-shadow:0 8px 25px #0003;opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s;z-index:30}.toast.show{opacity:1;transform:none}
+.modal{position:fixed;inset:0;background:#10182866;display:none;align-items:center;justify-content:center;z-index:40;padding:20px}.modal.open{display:flex}.dialog{width:min(520px,100%);background:var(--card);border-radius:16px;padding:22px;box-shadow:0 20px 50px #0003}.dialog h3{margin:0 0 14px}.dialog-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:16px}
+.checklist{display:grid;gap:8px}.checkitem{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}.checkitem input[type=text]{height:42px}.checkitem input[type=checkbox]{width:18px;height:18px}.remove{border:0;background:var(--soft);border-radius:9px;width:40px;height:40px}
+.structured{display:grid;gap:8px}.structrow{display:grid;grid-template-columns:1fr 2fr auto;gap:8px}
+.hidden{display:none!important}
+@media(max-width:860px){.editor-layout{grid-template-columns:220px minmax(0,1fr);gap:16px}.editor-main .rich{min-height:480px}}
+@media(max-width:700px){.app{padding:0 7px}.topbar{height:auto;min-height:70px;gap:6px;overflow:hidden}.brand{min-width:0;gap:6px}.brand h1{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.brand small{font-size:9px}.back,.logo{width:36px;height:36px;flex:none}.back{font-size:24px}.logo{font-size:19px}.actions{gap:4px;flex:none}.actions .btn span{display:none}.actions .btn{width:38px;min-width:38px;min-height:38px;padding:7px;justify-content:center}.panel{padding:17px}.editor-layout{grid-template-columns:1fr}.editor-sidebar{position:static;order:2}.editor-main{order:1}.editor-main .rich{min-height:360px}.grid2{grid-template-columns:1fr}.title-field,.tag-field{grid-template-columns:58px minmax(0,1fr);gap:8px}.title-field .caption,.tag-field .caption{margin:0}.structrow{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) auto;gap:5px}.structrow input{min-width:0;padding:0 8px}.structrow .remove{width:32px;height:40px}.sectionhead{align-items:flex-start;flex-direction:column}.right-actions{width:100%}.right-actions .btn{flex:1;justify-content:center}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand">
+    <button class="back" id="backBtn" title="Back to Notes Board">←</button>
+    <div class="logo">▣</div>
+    <div><h1>Note Editor</h1><small>STICKIES VAULT</small></div>
+  </div>
+  <div class="actions"><button class="btn" id="shareBtn">⇧ <span>Share</span></button><button class="btn primary" id="saveTop">▣ <span>Save</span></button></div>
+</header>
+
+<main class="panel">
+  <div class="editor-layout">
+    <aside class="editor-sidebar" aria-label="Note options">
+      <div class="sidebar-section">
+        <div class="title-field"><label class="caption">TITLE</label><input id="title" placeholder="Note title..." maxlength="180"></div>
+        <div class="tag-field"><label class="caption">TAG</label><input id="tags" placeholder="#ideas, #errands, #wellness..." maxlength="500"></div>
+        <div class="folder-field"><label class="caption">FOLDER</label><div class="folderrow"><select id="folder"></select><button class="btn" id="newFolder">+ Folder</button></div></div>
+      </div>
+      <div class="sidebar-section">
+        <button type="button" class="note-type-toggle" id="noteTypeToggle"><label class="caption">NOTE TYPE</label></button>
+        <div class="note-type-options" id="noteTypeOptions"><div class="pillrow">
+            <button class="pill active" data-type="normal">🖊 New Note</button>
+            <button class="pill" data-type="favorite">★ Favorite</button>
+            <button class="pill" data-type="secret">◐ Secret</button>
+            <button class="pill" data-type="checklist">☷ Checklist</button>
+        </div></div>
+      </div>
+      <div class="sidebar-section">
+        <button type="button" class="paper-color-toggle" id="paperColorToggle"><label class="caption">PAPER COLOR</label></button>
+        <div class="paper-color-options" id="paperColorOptions"><div class="colors">
+          <button type="button" class="color yellow active" data-color="yellow" title="Yellow" aria-label="Yellow paper" aria-pressed="true"></button>
+          <button type="button" class="color green" data-color="mint" title="Green" aria-label="Green paper" aria-pressed="false"></button>
+          <button type="button" class="color purple" data-color="lavender" title="Purple" aria-label="Purple paper" aria-pressed="false"></button>
+          <button type="button" class="color pink" data-color="rose" title="Pink" aria-label="Pink paper" aria-pressed="false"></button>
+          <button type="button" class="color orange" data-color="peach" title="Orange" aria-label="Orange paper" aria-pressed="false"></button>
+          <button type="button" class="color sky" data-color="cyan" title="Blue" aria-label="Blue paper" aria-pressed="false"></button>
+          <button type="button" class="color white" data-color="white" title="White" aria-label="White paper" aria-pressed="false"></button>
+          <div id="panelColor" title="Selected paper color" style="width:31px;height:31px;border-radius:9px;border:1px solid var(--line);margin-left:6px"></div>
+        </div></div>
+      </div>
+      <div class="sidebar-section">
+        <label class="caption">VIEW</label>
+        <div class="pillrow"><button class="pill active" id="plainTab">Plain note</button><button class="pill" id="structuredTab">Structured note</button></div>
+      </div>
+      <div class="sidebar-section">
+        <div class="section">
+          <button type="button" class="reminder-toggle" id="reminderToggle"><div class="sectiontitle">♧ &nbsp; Reminder</div><div class="sub" id="reminderStatus">No reminder set</div></button><div class="reminder-options" id="reminderOptions"><div class="right-actions"><button class="btn" id="alertsBtn">♧ &nbsp; Enable Alerts</button><button class="btn primary" id="reminderBtn">♧ &nbsp; Set Reminder</button></div></div>
+        </div>
+        <div class="workspace-divider"></div>
+        <div class="section">
+          <button type="button" class="attachments-toggle" id="attachmentsToggle"><div class="sectiontitle">▱ &nbsp; Attachments</div><div class="sub">Photos, voice memos, and doodles.</div></button><div class="attachments-options" id="attachmentsOptions"><div class="right-actions"><button class="btn" id="photoBtn">▧ &nbsp; Photo</button><button class="btn" id="voiceBtn">♩ &nbsp; <span id="voiceText">Voice</span></button><button class="btn" id="doodleBtn">✎ &nbsp; Doodle</button></div><input type="file" id="photoInput" accept="image/*" multiple class="hidden"><div class="media-preview" id="mediaPreview"></div></div>
+        </div>
+      </div>
+      <div class="sidebar-section tip"><b>Tip:</b> Tags are manual. Put URLs inside an <b>#ideas</b> note to make them clickable.</div>
+      <div class="status"><div class="ready"><span class="dot"></span><b id="statusText">Ready</b><span id="autosaveText" style="color:#69778d;font-size:13px"></span></div></div>
+    </aside>
+    <section class="editor-main">
+      <label class="caption">CONTENT</label>
+      <div id="plainEditor"><div class="rich" id="content" contenteditable="true" data-placeholder="Write your thought here... URLs become smart clickable links only for #ideas notes." role="textbox"></div><div class="char"><span id="count">0/5000</span></div></div>
+      <div id="structuredEditor" class="hidden"><div class="structured" id="rows"></div><button class="btn" id="addRow" style="margin-top:10px">+ Add row</button></div>
+      <div id="checkEditor" class="hidden"><div class="checklist" id="items"></div><button class="btn" id="addItem" style="margin-top:10px">+ Add item</button></div>
+    </section>
+  </div>
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal" id="folderModal"><div class="dialog">
+  <h3>Create Folder</h3><input id="folderName" placeholder="Folder name" maxlength="80">
+  <div class="dialog-actions"><button class="btn" data-close="folderModal">Cancel</button><button class="btn primary" id="createFolder">Create</button></div>
+</div></div>
+
+<div class="modal" id="reminderModal"><div class="dialog">
+  <h3>Set Reminder</h3><label class="caption">DATE & TIME</label><input id="reminderDate" type="datetime-local">
+  <div class="dialog-actions"><button class="btn danger" id="clearReminder">Clear</button><button class="btn" data-close="reminderModal">Cancel</button><button class="btn primary" id="confirmReminder">Set Reminder</button></div>
+</div></div>
+
+<div class="modal" id="doodleModal"><div class="dialog">
+  <h3>Doodle</h3><canvas id="canvas" width="700" height="350" style="width:100%;border:1px solid #ccd6e2;border-radius:12px;background:#fff;touch-action:none"></canvas>
+  <div class="dialog-actions"><button class="btn" id="clearDoodle">Clear</button><button class="btn" data-close="doodleModal">Cancel</button><button class="btn primary" id="saveDoodle">Save Doodle</button></div>
+</div></div>
+
+<script>
+const S=window.Stickies; S.applyTheme(); S.setupAutoLock();
+const API_URL = "http://127.0.0.1:8000";
+const KEY = "stickies_vault_editor_state_v1";
+const FOLDER_KEY = "stickies_vault_folders_v1";
+function makeDefaultState(type="normal", folderId=null){
+  return {
+    id:null,title:"",tags:"",folder:"Unfiled",folderId:folderId?Number(folderId):null,type:type||"normal",pinned:false,favorite:false,secret:false,
+    color:{normal:"yellow",favorite:"lavender",secret:"rose",checklist:"mint"}[type]||"yellow",
+    layout:"plain",html:"",text:"",rows:[],items:[],media:[],reminder:null,createdAt:null,updatedAt:null
+  };
+}
+let state = makeDefaultState();
+let backendFolders=[];
+let recorder=null, chunks=[], autosaveTimer=null, reminderTimer=null;
+
+const $=id=>document.getElementById(id);
+function toast(msg){$("toast").textContent=msg;$("toast").classList.add("show");clearTimeout(window.__toast);window.__toast=setTimeout(()=>$("toast").classList.remove("show"),2200)}
+function token(){return localStorage.getItem("stickies_access_token")||localStorage.getItem("access_token")||localStorage.getItem("token")||""}
+function getLocalNotes(){try{return JSON.parse(localStorage.getItem("stickies_vault_notes")||"[]")}catch{return[]}}
+function saveLocalNotes(notes){localStorage.setItem("stickies_vault_notes",JSON.stringify(notes))}
+function getFolders(){try{return JSON.parse(localStorage.getItem(FOLDER_KEY)||'[]')}catch{return[]}}
+function setFolders(a){localStorage.setItem(FOLDER_KEY,JSON.stringify(a||[]))}
+function fillFolders(selectedId=null, selectedName="Unfiled"){
+  const f=$("folder"); f.innerHTML="";
+  const un=document.createElement("option"); un.value=""; un.textContent="Unfiled"; f.appendChild(un);
+  backendFolders.forEach(x=>{const o=document.createElement("option");o.value=String(x.id);o.textContent=x.name;f.appendChild(o)});
+  if(selectedId!==null && selectedId!==undefined && selectedId!=="" && backendFolders.some(x=>Number(x.id)===Number(selectedId))){
+    f.value=String(selectedId);
+  } else if(selectedName && selectedName!=="Unfiled"){
+    const found=backendFolders.find(x=>String(x.name).toLowerCase()===String(selectedName).toLowerCase());
+    f.value=found?String(found.id):"";
+  } else f.value="";
+}
+async function syncFoldersFromBackend(selectedId=null, selectedName="Unfiled"){
+  let fs=[];
+  try{fs=await api("/folders")}catch(e){fs=typeof S.localFolders==="function"?S.localFolders():getFolders()}
+  backendFolders=Array.isArray(fs)?fs:[];
+  setFolders(backendFolders);
+  fillFolders(selectedId,selectedName);
+  return backendFolders;
+}
+function currentText(){return $("content").innerText||""}
+function setStatus(a,b=""){ $("statusText").textContent=a; $("autosaveText").textContent=b }
+function scheduleAutosave(){
+  clearTimeout(autosaveTimer); autosaveTimer=setTimeout(()=>{capture();localStorage.setItem(KEY,JSON.stringify(state));setStatus("Ready","Draft saved locally")},700)
+}
+const COLOR_HEX={yellow:"#fef08a",mint:"#a7f3d0",lavender:"#ddd6fe",rose:"#fbcfe8",peach:"#fed7aa",cyan:"#bae6fd",white:"#ffffff"};
+const COLOR_ALIASES={"#ffd92f":"yellow","#83dfbd":"mint","#b99af4":"lavender","#f5b1d1":"rose","#ffc47c":"peach","#82c9f2":"cyan","#ffffff":"white","yellow":"yellow","mint":"mint","lavender":"lavender","rose":"rose","peach":"peach","cyan":"cyan","white":"white","green":"mint","purple":"lavender","pink":"rose","orange":"peach","sky":"cyan"};
+function normalizeColor(c){return COLOR_ALIASES[String(c||"").toLowerCase()]||"yellow"}
+function htmlToText(html){const d=document.createElement("div");d.innerHTML=html||"";return d.innerText||d.textContent||""}
+function normalizeChecklistItems(items){
+  if(!Array.isArray(items)) return [];
+  return items
+    .map(item => ({ text: String(item?.text ?? '').trim(), done: !!item?.done }))
+    .filter(item => item.text || item.done);
+}
+function noteSnapshot(){
+  return JSON.stringify({
+    title: state.title,
+    tags: state.tags,
+    folderId: state.folderId,
+    folder: state.folder,
+    type: state.type,
+    favorite: state.favorite,
+    secret: state.secret,
+    color: state.color,
+    layout: state.layout,
+    html: state.html,
+    text: state.text,
+    rows: state.rows,
+    items: normalizeChecklistItems(state.items),
+    media: state.media,
+    reminder: state.reminder
+  });
+}
+function capture(){
+  const before = noteSnapshot();
+
+  state.title=$("title").value.trim();state.tags=$("tags").value.trim();
+  state.folderId=$("folder").value ? Number($("folder").value) : null;
+  const selectedFolder=backendFolders.find(x=>Number(x.id)===Number(state.folderId));
+  state.folder=selectedFolder?.name || "Unfiled";
+  state.html=$("content").innerHTML;state.text=currentText();
+  if(state.layout !== "structured" && state.type !== "checklist"){
+    const bulletLines = state.text.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => `• ${line.replace(/^[-*•]\s*/, '')}`);
+    if(bulletLines.length > 1){
+      state.text = bulletLines.join('\n');
+      $("content").innerHTML = bulletLines.map(line => `<div>${S.escapeHtml(line)}</div>`).join('');
+    }
+  }
+  state.rows=[...document.querySelectorAll(".structrow")].map(r=>({label:r.children[0].value,value:r.children[1].value})).filter(r=>String(r.label||'').trim() || String(r.value||'').trim());
+  state.items = normalizeChecklistItems([...document.querySelectorAll(".checkitem")].map(r=>({text:r.children[1].value,done:r.children[0].checked})));
+  const noteSource=[state.text,...state.rows.map(row=>`${row.label} ${row.value}`),...state.items.map(item=>item.text)].join(" ");
+  if(/(?:https?:\/\/|www\.)\S+/i.test(noteSource) && !state.tags.split(/[\s,]+/).some(tag=>S.normalizeTag(tag)==="ideas")){
+    state.tags=state.tags?`${state.tags}, #ideas`:"#ideas";
+    $("tags").value=state.tags;
+  }
+  const after = noteSnapshot();
+
+  if(before !== after) state.updatedAt = new Date().toISOString();
+}
+function updateCount(){let n=currentText().length;$("count").textContent=n+"/5000";if(n>5000){$("content").innerText=currentText().slice(0,5000)}}
+function setType(type){
+  state.type=type;
+  document.querySelectorAll("[data-type]").forEach(b=>b.classList.toggle("active",b.dataset.type===type));
+  if(type==="favorite") state.favorite=true;
+  if(type==="secret") state.secret=true;
+  $("checkEditor").classList.toggle("hidden",type!=="checklist");
+  if(type==="checklist"){$("plainEditor").classList.add("hidden");$("structuredEditor").classList.add("hidden")}
+  else if(state.layout==="structured"){$("plainEditor").classList.add("hidden");$("structuredEditor").classList.remove("hidden")}
+  else{$("plainEditor").classList.remove("hidden");$("structuredEditor").classList.add("hidden")}
+}
+function renderRows(rows=state.rows){
+  $("rows").innerHTML="";
+  (rows.length?rows:[{label:"",value:""}]).forEach(x=>addRow(x.label,x.value));
+}
+function addRow(label="",value=""){
+ const d=document.createElement("div");d.className="structrow";
+ d.innerHTML='<input placeholder="Label"><input placeholder="Value"><button class="remove" title="Remove row">×</button>';
+ d.children[0].value=label;d.children[1].value=value;d.children[2].onclick=()=>{d.remove();scheduleAutosave()};$("rows").appendChild(d);
+}
+function renderItems(items=state.items){
+  $("items").innerHTML="";
+  const filtered = Array.isArray(items) ? items.filter(item => item && (String(item.text||'').trim() || item.done)) : [];
+  (filtered.length ? filtered : [{text:"",done:false}]).forEach(x=>addItem(x.text,x.done));
+}
+function addItem(text="",done=false){
+ const d=document.createElement("div");d.className="checkitem";
+ d.innerHTML='<input type="checkbox"><input type="text" placeholder="Task"><button class="remove" title="Remove item">×</button>';
+ d.children[0].checked=done;d.children[1].value=text;d.children[2].onclick=()=>{d.remove();capture();localStorage.setItem(KEY, JSON.stringify(state));setStatus("Ready","Draft saved locally");};
+ d.children[0].addEventListener("change",()=>{capture();localStorage.setItem(KEY,JSON.stringify(state));setStatus("Ready","Checklist updated");});
+ d.children[1].addEventListener("input",()=>{capture();localStorage.setItem(KEY,JSON.stringify(state));setStatus("Ready","Checklist updated");});
+ $("items").appendChild(d);
+}
+function applyColor(c){
+  const key=normalizeColor(c);
+  state.color=key;
+  document.querySelectorAll(".color").forEach(b=>{
+    const active=b.dataset.color===key;
+    b.classList.toggle("active",active);
+    b.setAttribute("aria-pressed",active?"true":"false");
+  });
+  $("panelColor").style.background=COLOR_HEX[key];
+  $("content").style.background=COLOR_HEX[key];
+  $("panelColor").title="Selected paper color: "+key;
+  localStorage.setItem(KEY,JSON.stringify(state));
+}
+function renderMedia(){
+ $("mediaPreview").innerHTML="";
+ state.media.forEach((m,i)=>{
+   const d=document.createElement("div");d.className="media-card";
+   if(m.kind==="image"){d.innerHTML='<img src="'+m.data+'"><button class="btn" style="margin-top:6px;width:100%">Remove</button>'}
+   else if(m.kind==="audio"){d.innerHTML='<audio controls src="'+m.data+'"></audio><button class="btn" style="margin-top:6px;width:100%">Remove</button>'}
+   else{d.innerHTML='<img src="'+m.data+'" style="max-width:240px"><button class="btn" style="margin-top:6px;width:100%">Remove</button>'}
+   d.querySelector("button").onclick=()=>{state.media.splice(i,1);renderMedia();scheduleAutosave()};$("mediaPreview").appendChild(d)
+ })
+}
+async function api(path,opts={}){
+ const headers={"Content-Type":"application/json",...(opts.headers||{})};
+ if(token())headers.Authorization="Bearer "+token();
+ const r=await fetch(API_URL+path,{...opts,headers});
+ if(!r.ok)throw new Error((await r.text())||r.statusText);
+ return r.status===204?null:r.json();
+}
+async function saveNote(){
+ capture();
+ if(!state.title && !currentText().trim() && !(state.rows||[]).some(r=>r.label||r.value) && !(state.items||[]).some(i=>i.text)){
+   toast("Add some content before saving");
+   return;
+ }
+ state.createdAt=state.createdAt||new Date().toISOString();
+ if(!state.updatedAt) state.updatedAt=new Date().toISOString();
+ setStatus("Saving…","");
+ const payload={title:state.title||"Untitled",content:JSON.stringify({...state,version:3,folderId:state.folderId||null,folder:state.folder||"Unfiled"})};
+ try{
+   let result;
+   if(state.id && !String(state.id).startsWith("local-")) {
+     result=await api("/notes/"+encodeURIComponent(state.id),{method:"PUT",body:JSON.stringify(payload)});
+   } else {
+     result=await api("/notes",{method:"POST",body:JSON.stringify(payload)});
+     state.id=result?.id||result?.note?.id||null;
+   }
+   if(!state.id) throw new Error("The server did not return a note ID.");
+   const notes=getLocalNotes().filter(n=>String(n.id)!==String(state.id));notes.push({...state});saveLocalNotes(notes);
+   localStorage.removeItem(KEY);
+   setStatus("Saved","");
+   toast("Note saved successfully");
+   setTimeout(goBoard,450);
+ }catch(e){
+   // Keep the note usable even when the API is temporarily unavailable.
+   // A local ID prevents a failed network request from losing the note.
+   const localId=state.id&&String(state.id).startsWith("local-")?state.id:`local-${Date.now()}`;
+   state.id=localId;
+   const notes=getLocalNotes().filter(n=>String(n.id)!==String(localId));
+   notes.push({...state});
+   saveLocalNotes(notes);
+   localStorage.removeItem(KEY);
+   setStatus("Saved locally", "Backend unavailable");
+   toast("Note saved on this device. Backend was unavailable.");
+   setTimeout(goBoard,650);
+ }
+}
+function goBoard(){S.go("../notes_board/code.html")}
+async function loadNote(id){
+ let found=null;
+ try{found=await api("/notes/"+encodeURIComponent(id))}catch{}
+ if(!found)found=getLocalNotes().find(n=>String(n.id)===String(id));
+ if(!found)return;
+ const base = makeDefaultState();
+ if(found.content){
+   try{
+     const c=JSON.parse(found.content);
+     state={...base, ...c, id:found.id, title:found.title||c.title||"", color:normalizeColor(c.color), text:c.text||htmlToText(c.html||""), rows:Array.isArray(c.rows)?c.rows.filter(r=>String(r.label||'').trim() || String(r.value||'').trim()):[], items:Array.isArray(c.items)?c.items.filter(item=>String(item.text||'').trim() || item.done):[], media:Array.isArray(c.media)?c.media:[] };
+     if(typeof c.favorite === 'boolean') state.favorite = c.favorite;
+     if(typeof c.secret === 'boolean') state.secret = c.secret;
+     if(typeof c.pinned === 'boolean') state.pinned = c.pinned;
+     if(c.type) state.type = c.type;
+   }catch{state={...base, ...found, id:found.id, title:found.title||"", color:normalizeColor(found.color)};}
+ } else {
+   state={...base, ...found, id:found.id, title:found.title||"", color:normalizeColor(found.color)};
+ }
+ fillForm();
+}
+function fillForm(){
+ $("title").value=state.title||"";$("tags").value=state.tags||"";fillFolders(state.folderId,state.folder||"Unfiled");
+ $("content").innerHTML=state.html||state.text||"";updateCount();applyColor(state.color||"yellow");
+ $("plainTab").classList.toggle("active",state.layout!=="structured");$("structuredTab").classList.toggle("active",state.layout==="structured");
+ renderRows(state.rows||[]);renderItems(state.items||[]);renderMedia();setType(state.type||"normal");
+ if(state.reminder){$("reminderStatus").textContent="Reminder: "+new Date(state.reminder).toLocaleString();scheduleReminder()}else $("reminderStatus").textContent="No reminder set";
+ setStatus("Ready","");
+}
+function newNote(type="normal",folderId=null){const t=type||"normal";localStorage.removeItem(KEY);state=makeDefaultState(t, folderId);if(state.type==="favorite"){state.favorite=true}if(state.type==="secret"){state.secret=true}fillForm();history.replaceState(null,"",location.pathname+`?type=${encodeURIComponent(state.type)}${state.folderId?`&folder=${state.folderId}`:""}`);toast("New note ready")}
+function openModal(id){$(id).classList.add("open")}function closeModal(id){$(id).classList.remove("open")}
+function scheduleReminder(){
+ clearTimeout(reminderTimer);if(!state.reminder)return;const ms=new Date(state.reminder).getTime()-Date.now();if(ms<=0)return;
+ reminderTimer=setTimeout(()=>{if("Notification" in window && Notification.permission==="granted")new Notification("Stickies Vault Reminder",{body:state.title||"Reminder"});toast("Reminder: "+(state.title||"Note"))},Math.min(ms,2147483647))
+}
+function sanitizeShare(){return (state.title||"Untitled")+"\n\n"+currentText()}
+document.addEventListener("input",e=>{if(["title","tags","folder","content"].includes(e.target.id)||e.target.closest(".structrow")){updateCount();scheduleAutosave()}});
+$("backBtn").onclick=()=>goBoard();
+  $("saveTop").onclick=saveNote;
+document.querySelectorAll("[data-type]").forEach(b=>b.onclick=()=>{setType(b.dataset.type);scheduleAutosave()});
+document.querySelectorAll(".color").forEach(b=>b.addEventListener("click",e=>{
+  e.preventDefault();
+  e.stopPropagation();
+  applyColor(b.dataset.color);
+  capture();
+  localStorage.setItem(KEY,JSON.stringify(state));
+  setStatus("Color selected", "Draft saved locally");
+  scheduleAutosave();
+}));
+$("plainTab").onclick=()=>{state.layout="plain";setType(state.type);scheduleAutosave()};
+$("structuredTab").onclick=()=>{state.layout="structured";setType(state.type);scheduleAutosave()};
+$("addRow").onclick=()=>{addRow();scheduleAutosave()};$("addItem").onclick=()=>{addItem();scheduleAutosave()};
+$("alertsBtn").onclick=async()=>{if(!("Notification"in window)){toast("Browser notifications are not supported");return}let p=await Notification.requestPermission();toast(p==="granted"?"Alerts enabled":"Notification permission not granted")};
+$("reminderBtn").onclick=()=>{if(state.reminder)$("reminderDate").value=new Date(state.reminder).toISOString().slice(0,16);else{const d=new Date(Date.now()+3600000);d.setSeconds(0,0);$("reminderDate").value=d.toISOString().slice(0,16)}openModal("reminderModal")};
+$("confirmReminder").onclick=()=>{const v=$("reminderDate").value;if(!v){toast("Choose a date and time");return}state.reminder=new Date(v).toISOString();$("reminderStatus").textContent="Reminder: "+new Date(state.reminder).toLocaleString();closeModal("reminderModal");scheduleReminder();scheduleAutosave();toast("Reminder set")};
+$("clearReminder").onclick=()=>{state.reminder=null;$("reminderStatus").textContent="No reminder set";closeModal("reminderModal");clearTimeout(reminderTimer);scheduleAutosave();toast("Reminder cleared")};
+$("reminderToggle").onclick=()=>{$("reminderToggle").classList.toggle("open");$("reminderOptions").classList.toggle("open")};
+$("attachmentsToggle").onclick=()=>{$("attachmentsToggle").classList.toggle("open");$("attachmentsOptions").classList.toggle("open")};
+$("noteTypeToggle").onclick=()=>{$("noteTypeToggle").classList.toggle("open");$("noteTypeOptions").classList.toggle("open")};
+$("paperColorToggle").onclick=()=>{$("paperColorToggle").classList.toggle("open");$("paperColorOptions").classList.toggle("open")};
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
+$("newFolder").onclick=()=>{ $("folderName").value="";openModal("folderModal");setTimeout(()=>$("folderName").focus(),50)};
+$("createFolder").onclick=async()=>{const n=$("folderName").value.trim();if(!n){toast("Enter a folder name");return}try{let r;try{r=await api("/folders",{method:"POST",body:JSON.stringify({name:n})})}catch(e){if(typeof S.addLocalFolder!=="function")throw e;r=S.addLocalFolder(n)}await syncFoldersFromBackend(r?.id,r?.name||n);state.folderId=r?.id?Number(r.id):null;state.folder=r?.name||n;$("folder").value=state.folderId?String(state.folderId):"";closeModal("folderModal");scheduleAutosave();toast("Folder created")}catch(e){toast(e?.message||"Could not create folder")}};
+$("photoBtn").onclick=()=>$("photoInput").click();
+$("photoInput").onchange=async e=>{for(const file of e.target.files){const data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)});state.media.push({kind:"image",name:file.name,data});}renderMedia();e.target.value="";scheduleAutosave();toast("Photo attached")};
+$("voiceBtn").onclick=async()=>{
+ if(recorder?.state==="recording"){recorder.stop();return}
+ if(!navigator.mediaDevices?.getUserMedia){toast("Microphone is not available in this browser");return}
+ try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});chunks=[];recorder=new MediaRecorder(stream);recorder.ondataavailable=e=>chunks.push(e.data);recorder.onstop=()=>{const blob=new Blob(chunks,{type:"audio/webm"});const r=new FileReader();r.onload=()=>{state.media.push({kind:"audio",name:"Voice memo",data:r.result});renderMedia();scheduleAutosave();toast("Voice memo saved")};r.readAsDataURL(blob);stream.getTracks().forEach(t=>t.stop());$("voiceText").textContent="Voice"};recorder.start();$("voiceText").textContent="Stop recording";toast("Recording…")}catch(e){toast("Microphone permission was denied")}};
+let canvas=$("canvas"),ctx=canvas.getContext("2d"),drawing=false,last={x:0,y:0};
+function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+function start(e){drawing=true;last=pos(e)}function move(e){if(!drawing)return;const p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.strokeStyle="#172033";ctx.lineWidth=4;ctx.lineCap="round";ctx.stroke();last=p}function end(){drawing=false}
+canvas.addEventListener("pointerdown",start);canvas.addEventListener("pointermove",move);canvas.addEventListener("pointerup",end);canvas.addEventListener("pointerleave",end);
+$("doodleBtn").onclick=()=>{ctx.clearRect(0,0,canvas.width,canvas.height);openModal("doodleModal")};
+$("clearDoodle").onclick=()=>ctx.clearRect(0,0,canvas.width,canvas.height);
+$("saveDoodle").onclick=()=>{state.media.push({kind:"doodle",name:"Doodle",data:canvas.toDataURL("image/png")});renderMedia();closeModal("doodleModal");scheduleAutosave();toast("Doodle saved")};
+$("shareBtn").onclick=async()=>{capture();const text=sanitizeShare();try{if(navigator.share)await navigator.share({title:state.title||"Stickies Vault note",text});else{await navigator.clipboard.writeText(text);toast("Note copied to clipboard")}}catch(e){if(e.name!=="AbortError"){try{await navigator.clipboard.writeText(text);toast("Note copied to clipboard")}catch{toast("Sharing was cancelled")}}}};
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){e.preventDefault();saveNote()}});
+(async()=>{
+ const params=new URLSearchParams(location.search);
+ const id=params.get("edit")||params.get("id")||sessionStorage.getItem("stickies_vault_editing_note_id");
+ const type=params.get("type")||"normal";
+ const folderParam=params.get("folder");
+ try{await syncFoldersFromBackend(folderParam?Number(folderParam):null,"Unfiled");}catch(e){toast(e?.message||"Could not load folders");return}
+ if(id){await loadNote(id);}
+ else newNote(type,folderParam);
+})();
+</script>
+</body>
+</html>

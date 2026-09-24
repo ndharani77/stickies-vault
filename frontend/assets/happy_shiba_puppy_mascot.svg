@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" fill="none">
+  <!-- Adorable round baby shiba inu / puppy with little paws -->
+  <!-- Cute folded triangular ears -->
+  <polygon points="26,38 42,16 54,34" fill="#F59E0B" stroke="#1E1E24" stroke-width="2.5" stroke-linejoin="round"/>
+  <polygon points="32,34 40,22 48,32" fill="#FEF3C7"/>
+
+  <polygon points="66,34 78,16 94,38" fill="#F59E0B" stroke="#1E1E24" stroke-width="2.5" stroke-linejoin="round"/>
+  <polygon points="72,32 80,22 88,34" fill="#FEF3C7"/>
+
+  <!-- Head -->
+  <circle cx="60" cy="58" r="32" fill="#FBBF24" stroke="#1E1E24" stroke-width="2.8"/>
+  <!-- White muzzle / white cheek patches -->
+  <ellipse cx="60" cy="67" rx="20" ry="16" fill="#FFFBEB"/>
+  <!-- Shiba brow white dots -->
+  <circle cx="48" cy="46" r="3" fill="#FFFBEB"/>
+  <circle cx="72" cy="46" r="3" fill="#FFFBEB"/>
+
+  <!-- Eyes -->
+  <ellipse cx="48" cy="56" rx="4" ry="5" fill="#1E1E24"/>
+  <circle cx="49.5" cy="54" r="1.5" fill="#FFFFFF"/>
+  <ellipse cx="72" cy="56" rx="4" ry="5" fill="#1E1E24"/>
+  <circle cx="73.5" cy="54" r="1.5" fill="#FFFFFF"/>
+
+  <!-- Cute puppy nose & open happy tongue smile -->
+  <ellipse cx="60" cy="64" rx="3.5" ry="2.5" fill="#1E1E24"/>
+  <path d="M55,68 C58,70 60,69 60,68 C60,69 62,70 65,68" stroke="#1E1E24" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M58,69 C58,74 62,74 62,69 Z" fill="#F43F5E"/>
+
+  <!-- Rosy cheeks -->
+  <ellipse cx="38" cy="65" rx="4.5" ry="2.5" fill="#FB7185" opacity="0.8"/>
+  <ellipse cx="82" cy="65" rx="4.5" ry="2.5" fill="#FB7185" opacity="0.8"/>
+
+  <!-- Little paws -->
+  <ellipse cx="42" cy="86" rx="9" ry="7" fill="#FFFBEB" stroke="#1E1E24" stroke-width="2.2"/>
+  <ellipse cx="78" cy="86" rx="9" ry="7" fill="#FFFBEB" stroke="#1E1E24" stroke-width="2.2"/>
+</svg>
